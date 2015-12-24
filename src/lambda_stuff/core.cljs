@@ -24,7 +24,7 @@
         (async-lambda-fn
             (fn [{:keys [exercise date-hour] :as event} context]
                 (go
-                    (let [creds (assoc :region "eu-west-1" (eulalie.creds/env))]
+                    (let [creds (assoc (eulalie.creds/env) :region "eu-west-1")]
                          (if (and exercise date-hour)
                              (put-item! creds table (build-item (exercise->schema exercise) event))
                              (js/Error (str "Sorry, you must specify an exercise and date-hour (time of exercise to the hour). Was given exercise: '" + exercise + "' and date-hour: '" + date-hour + "'.")))))))))
@@ -34,7 +34,7 @@
          (async-lambda-fn
              (fn [{:keys [exercise]} context]
                   (go
-                      (let [creds (assoc :region "eu-west-1" (eulalie.creds/env))]
+                      (let [creds (assoc (eulalie.creds/env) :region "eu-west-1")]
                            (if exercise
-                               (js/Error "Wooo") ;; (query! creds table {:exercise [:= exercise]})
+                               (query! creds table {:exercise [:= exercise]} {:limit 10})
                                (js/Error "No exercise was specified."))))))))
