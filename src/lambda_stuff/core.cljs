@@ -17,7 +17,7 @@
   (exercise-type->schema (exercise->type exercise)))
 
 (defn build-item
-  [event schema]
+  [schema event]
   (into {} (map (fn [k] (hash-map k (event k))) schema)))
 
 (def ^:export add-exercise
