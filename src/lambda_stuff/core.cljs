@@ -7,7 +7,8 @@
     (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (def exercise->type
-  {"barbell-deadlift" :weighted})
+  {"barbell-deadlift" :weighted
+   "sumo-deadlift" :weighted})
 
 (def exercise-type->schema
   {:weighted #{:exercise :date-hour :weight-kg :reps}})
@@ -19,6 +20,16 @@
 (defn build-item
   [schema event]
   (into {} (map (fn [k] (hash-map k (event k))) schema)))
+
+(defn read-all-from-query
+  [query]
+  (go
+    (loop [item (<! query)
+           items []]
+      (println item "," items)
+      (if item
+        (recur (<! query) (conj items item))
+        items))))
 
 (def ^:export add-exercise
   (let [table :exercise]
@@ -37,5 +48,5 @@
         (go
           (let [creds (assoc (eulalie.creds/env) :region "eu-west-1")]
             (if exercise
-              (<! (query! creds table {:exercise [:= exercise]} {:limit 10}))
+              (<! (read-all-from-query (query! creds table {:exercise [:= exercise]} {:limit 10})))
               (js/Error "No exercise was specified."))))))))
