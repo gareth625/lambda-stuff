@@ -4,9 +4,11 @@
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "1.7.145"]
                  [org.clojure/core.async "0.2.371"]
+                 [com.andrewmcveigh/cljs-time "0.3.14"]
                  [io.nervous/cljs-lambda "0.1.2"]
                  [io.nervous/eulalie "0.6.4"]
-                 [io.nervous/hildebrand "0.4.3"]]
+                 [io.nervous/hildebrand "0.4.3"]
+                 [prismatic/schema "1.0.4"]]
   :profiles {:dev {:dependencies
                    [[com.cemerick/piggieback "0.2.1"]
                     [org.clojure/tools.nrepl "0.2.10"]]
