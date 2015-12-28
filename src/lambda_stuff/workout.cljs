@@ -9,18 +9,7 @@
             [schema.core :as s :include-macros true])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
-(def workout-schema
-  "The required fields when submitting a workout.
-
-  Data shouldn't be in code. Makes updating tedious ;)"
-  {:type s/Str
-   :date-hour s/Str
-   :workout-id s/Str
-   :title s/Str
-   :feelings s/Str
-   :notes s/Str})
-
-(defn create-workout-table
+(defn create-workout-table!
   "Creates the DynamoDB table to store workouts.
 
   If the table exists then no change is made. A workout is a collection of
@@ -39,3 +28,31 @@
                           :indexes {:local [{:name :workout-id-by-type
                                              :keys [:type :workout-id]
                                              :project [:keys-only]}]}})))))
+
+(def workout-schema
+  "The required fields when submitting a workout.
+
+  Data shouldn't be in code. Makes updating tedious ;)"
+  {:workout s/Str
+   :date-hour s/Str
+   :title s/Str
+   :feelings s/Str
+   :notes s/Str})
+
+; (s/defn add-workout!
+;   ""
+;   [creds :- {:access-key s/Str :secret-key s/Str}
+;   table :- s/Keyword
+;   {:keys {workout date-hour} :as event} :- workout-schema
+;   context]
+(defn add-workout!
+  ""
+  [creds table {:keys {workout date-hour} :as event} context]
+  (go
+    (if (and workout date-hour)
+      (<! (put-item! creds table event)))
+      (js/Error (str "Sorry, you must specify a workout and date-hour (time of the workout to the hour). Was given workout: '"
+                     workout
+                     "' and date-hour: '"
+                     date-hour
+                     "'."))))

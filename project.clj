@@ -28,6 +28,9 @@
         {:name "create-exercise-table"
          :invoke lambda-stuff.core/create-exercise-table
          :timeout 10}
+        {:name   "add-workout"
+         :invoke lambda-stuff.core/add-workout
+         :timeout 10}
         ; {:name   "add-exercise"
         ;  :invoke lambda-stuff.core/add-exercise
         ;  :timeout 10}
