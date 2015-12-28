@@ -20,10 +20,19 @@
   :cljs-lambda
       {:defaults {:role "arn:aws:iam::141786013431:role/lambda_role"}
        :functions
-       [{:name   "add-exercise"
-         :invoke lambda-stuff.core/add-exercise}
-        {:name   "get-exercise"
-         :invoke lambda-stuff.core/get-exercise}]}
+       [{:name "create-workout-table"
+         :invoke lambda-stuff.core/create-workout-table
+         :timeout 10}
+        {:name "create-exercise-table"
+         :invoke lambda-stuff.core/create-exercise-table
+         :timeout 10}
+        ; {:name   "add-exercise"
+        ;  :invoke lambda-stuff.core/add-exercise
+        ;  :timeout 10}
+        ; {:name   "get-exercise"
+        ;  :invoke lambda-stuff.core/get-exercise
+        ;  :timeout 10}
+        ]}
   :cljsbuild
       {:builds [{:id "lambda-stuff"
                  :source-paths ["src"]
