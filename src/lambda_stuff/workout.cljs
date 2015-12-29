@@ -21,12 +21,12 @@
       (<! (create-table! creds
                          {:table table-name
                           :throughput {:read 1 :write 1}
-                          :attrs {:type :string
+                          :attrs {:workout :string
                                   :date-hour :string
                                   :workout-id :string}
-                          :keys  [:type :date-hour]
-                          :indexes {:local [{:name :workout-id-by-type
-                                             :keys [:type :workout-id]
+                          :keys  [:workout :date-hour]
+                          :indexes {:local [{:name :workout-id-by-workout
+                                             :keys [:workout :workout-id]
                                              :project [:keys-only]}]}})))))
 
 (def workout-schema
@@ -39,15 +39,16 @@
    :feelings s/Str
    :notes s/Str})
 
-; (s/defn add-workout!
-;   ""
-;   [creds :- {:access-key s/Str :secret-key s/Str}
-;   table :- s/Keyword
-;   {:keys {workout date-hour} :as event} :- workout-schema
-;   context]
-(defn add-workout!
+;; TODO Move some of the more common useful stuff into a util
+;;      date checking
+;;      lower everything
+;;      limit workout?
+(s/defn ^:always-validate add-workout!
   ""
-  [creds table {:keys {workout date-hour} :as event} context]
+  [creds :- {:access-key s/Str :secret-key s/Str (s/optional-key :token) s/Str (s/optional-key :region) s/Str}
+   table :- s/Keyword
+   {:keys [workout date-hour] :as event} :- workout-schema
+   context]
   (go
     (if (and workout date-hour)
       (<! (put-item! creds table event)))
