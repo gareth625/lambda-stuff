@@ -23,26 +23,34 @@
    (s/optional-key :token) s/Str
    (s/optional-key :region) s/Str})
 
+(s/defschema Workout
+  "Allowed keys for the workout field."
+  (s/enum :field :playground :gym :run :swim :cycle :multisport))
+
 (s/defschema UserWorkout
   "This is workout schema that user will create and typically is seen."
-  {:workout s/Str
+  {:workout Workout
    :date-hour (s/pred date-hour?)
    :title s/Str
    (s/optional-key :feelings) (s/maybe s/Str)
    (s/optional-key :notes) (s/maybe s/Str)
    (s/optional-key :exercises) [s/Any]}) ;; exercise/ClientExercise]})
 
-(s/def db-workout-schema-version :- s/Int 1)
+(s/defschema WorkoutSchemaVersion
+  "Version scheme for the workouts."
+  s/Int)
 
 (s/defschema DbWorkout
   "The schema for workouts as they are stored in the DB."
   {:id s/Str
-   :version s/Int
-   :workout s/Str
+   :version WorkoutSchemaVersion
+   :workout Workout
    :date-hour (s/pred date-hour?)
    :title s/Str
    (s/optional-key :feelings) (s/maybe s/Str)
    (s/optional-key :notes) (s/maybe s/Str)})
+
+(s/def db-workout-schema-version :- WorkoutSchemaVersion 1)
 
 (s/defn ^:always-validate create-workout-table
   "Creates the DynamoDB table to store workouts.
