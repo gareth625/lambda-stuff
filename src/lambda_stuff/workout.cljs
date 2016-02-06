@@ -6,49 +6,10 @@
             [eulalie.creds]
             [hildebrand.channeled :refer [query!]]
             [hildebrand.core :refer [create-table! put-item! table-status!]]
+            [lambda-stuff.schema :refer [AwsCredentials DbWorkout UserWorkout WorkoutSchemaVersion]]
             [schema.core :as s :include-macros true])
   (:require-macros [cljs.core.async.macros :refer [go]]))
             ;;- [lambda-stuff.exercise :as exercise]
-
-(let [dh-formatter (f/formatters :date-hour)]
-  (s/defn date-hour? :- s/Bool
-    "Returns true if we can construct a date time object with the date and hour set from the input string."
-    [s :- s/Str]
-    (not (nil? (f/parse dh-formatter s)))))
-
-(s/defschema AwsCredentials
-  "Expected credentials map form."
-  {:access-key s/Str
-   :secret-key s/Str
-   (s/optional-key :token) s/Str
-   (s/optional-key :region) s/Str})
-
-(s/defschema Workout
-  "Allowed keys for the workout field."
-  (s/enum :field :playground :gym :run :swim :cycle :multisport))
-
-(s/defschema UserWorkout
-  "This is workout schema that user will create and typically is seen."
-  {:workout Workout
-   :date-hour (s/pred date-hour?)
-   :title s/Str
-   (s/optional-key :feelings) (s/maybe s/Str)
-   (s/optional-key :notes) (s/maybe s/Str)
-   (s/optional-key :exercises) [s/Any]}) ;; exercise/ClientExercise]})
-
-(s/defschema WorkoutSchemaVersion
-  "Version scheme for the workouts."
-  s/Int)
-
-(s/defschema DbWorkout
-  "The schema for workouts as they are stored in the DB."
-  {:id s/Str
-   :version WorkoutSchemaVersion
-   :workout Workout
-   :date-hour (s/pred date-hour?)
-   :title s/Str
-   (s/optional-key :feelings) (s/maybe s/Str)
-   (s/optional-key :notes) (s/maybe s/Str)})
 
 (s/def db-workout-schema-version :- WorkoutSchemaVersion 1)
 
