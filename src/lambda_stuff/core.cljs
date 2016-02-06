@@ -1,32 +1,30 @@
 (ns lambda-stuff.core
-  (:require [lambda-stuff.exercise :as exercise]
+  (:require ;;- [lambda-stuff.exercise :as exercise]
             [lambda-stuff.workout :as workout]
             [cljs-lambda.util :refer [async-lambda-fn]]
             [eulalie.creds]))
 
 (let [creds (assoc (eulalie.creds/env) :region "eu-west-1")
-      exercise-table :exercise
-      workout-table :workout]
+      workout-table :workout
+      exercise-table :exercise]
     (def ^{:export true
            :doc "Creates the DynamoDB table (for now hardcoded name) to store workouts."}
          create-workout-table
       (async-lambda-fn
-        (fn [] (workout/create-workout-table! creds workout-table))))
+        (fn [] (workout/create-workout-table creds workout-table))))
 
     (def ^{:export true
            :doc "Create the DynamoDB table (for now hardcoded name) to store exercises associated with a workout."}
          create-exercise-table
       (async-lambda-fn
-        (fn [] (exercise/create-exercise-table creds exercise-table))))
+        (fn [] nil))) ;;- (exercise/create-exercise-table creds exercise-table))))
 
     (def ^{:export true
            :doc "Adds a new workout and exercise list."}
          add-workout
       (async-lambda-fn
         (fn [event context]
-          ;; Should remove the exericses from the workout and then add those
-          ;; separately. Once we get that advanced :)
-          (workout/add-workout! creds workout-table event context))))
+          (workout/add-workout creds workout-table event context))))
 )
 
 ; (def ^:export add-exercise
