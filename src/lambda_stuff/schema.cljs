@@ -27,6 +27,15 @@
    (s/optional-key :token) s/Str
    (s/optional-key :region) s/Str})
 
+(s/defschema Context
+  "The context given to the lambda functions.
+
+  This is defined by the cljs-lambda plugin so this is more for documentation of
+  the data structure than validation. Well I hope they've not go any bugs!"
+  ;; TODO This needs to live up to the doc string ;)
+  ;; https://github.com/nervous-systems/cljs-lambda#context-object
+  s/Any)
+
 (s/defschema Workout
   "Allowed keys for the workout field."
   (s/enum "field" "playground" "gym" "run" "swim" "cycle" "multisport"))
@@ -34,7 +43,7 @@
 (s/defschema UserWorkout
   "This is workout schema that user will create and typically is seen."
   {:workout Workout
-   :date-hour (s/pred date-hour?)
+   :date-hour (s/pred date-hour? 'date-hour?)
    :title s/Str
    (s/optional-key :feelings) (s/maybe s/Str)
    (s/optional-key :notes) (s/maybe s/Str)
@@ -49,7 +58,7 @@
   {:id s/Str
    :version WorkoutSchemaVersion
    :workout Workout
-   :date-hour (s/pred date-hour?)
+   :date-hour (s/pred date-hour? 'date-hour?)
    :title s/Str
    (s/optional-key :feelings) (s/maybe s/Str)
    (s/optional-key :notes) (s/maybe s/Str)})

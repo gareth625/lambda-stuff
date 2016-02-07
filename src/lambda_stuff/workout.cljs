@@ -1,12 +1,12 @@
 (ns lambda-stuff.workout
-  (:require [cljs.core.async :refer [take! <!]]
+  (:require [cljs.core.async :as async :refer [<!]]
             [cljs-lambda.util :refer [async-lambda-fn]]
             [cljs-time.core :as t]
             [cljs-time.format :as f]
             [eulalie.creds]
             [hildebrand.channeled :refer [query!]]
             [hildebrand.core :refer [create-table! put-item! table-status!]]
-            [lambda-stuff.schema :refer [AwsCredentials DbWorkout UserWorkout WorkoutSchemaVersion]]
+            [lambda-stuff.schema :refer [AwsCredentials Context DbWorkout UserWorkout Workout WorkoutSchemaVersion]]
             [schema.core :as s :include-macros true])
   (:require-macros [cljs.core.async.macros :refer [go]]))
             ;;- [lambda-stuff.exercise :as exercise]
@@ -20,7 +20,8 @@
    exercises and this table stores the workout type, date and any notes on the
    workout itself but not the individual exercises."
    [creds :- AwsCredentials
-    table-name :- s/Keyword]
+    table-name :- s/Keyword
+    context :- Context]
    (go
      (when-not (<! (table-status! creds table-name))
        (<! (create-table! creds
@@ -47,16 +48,31 @@
            user-workout))
 
 (s/defn ^:always-validate add-workout
-  ""
+  "Stores a user workout."
   [creds :- AwsCredentials
    table :- s/Keyword
    {:keys [workout date-hour] :as user-workout} :- UserWorkout
-    context :- s/Any]
-   (go
-     (if (and workout date-hour)
-       (<! (put-item! creds table (user->db-workout user-workout)))
-       (js/Error (str "Sorry, you must specify a workout and date-hour (time of the workout to the hour). Was given workout: '"
-                      workout
-                      "' and date-hour: '"
-                      date-hour
-                      "'.")))))
+   context :- Context]
+   (go (<! (put-item! creds table (user->db-workout user-workout)))))
+
+(s/defn ^:always-validate get-workouts
+  "Retrieves all the workouts for a given workout type.
+
+  Can optionally filter the returned workouts."
+  [creds :- AwsCredentials
+   table :- s/Keyword
+   {:keys [workout date-part] :as event} :- {:workout Workout :date-part s/Str}
+   context :- Context]
+  (async/into [] (query! creds
+                         table
+                         {:workout [:= workout]
+                          :date-hour [:begins-with date-part]}
+                         {:limit 100})))
+
+(s/defn ^:always-validate get-workout :- [UserWorkout]
+  "Retrieves a workout either by it's ID or type and log time."
+  [creds :- AwsCredentials
+   table :- s/Keyword
+   event :- s/Any
+   context :- Context]
+  nil)

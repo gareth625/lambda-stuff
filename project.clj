@@ -31,6 +31,9 @@
         {:name   "add-workout"
          :invoke lambda-stuff.core/add-workout
          :timeout 10}
+        {:name   "get-workouts"
+         :invoke lambda-stuff.core/get-workouts
+         :timeout 10}
         ; {:name   "add-exercise"
         ;  :invoke lambda-stuff.core/add-exercise
         ;  :timeout 10}

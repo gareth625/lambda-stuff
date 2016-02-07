@@ -11,13 +11,13 @@
            :doc "Creates the DynamoDB table (for now hardcoded name) to store workouts."}
          create-workout-table
       (async-lambda-fn
-        (fn [] (workout/create-workout-table creds workout-table))))
+        (fn [_ context] (workout/create-workout-table creds workout-table context))))
 
     (def ^{:export true
            :doc "Create the DynamoDB table (for now hardcoded name) to store exercises associated with a workout."}
          create-exercise-table
       (async-lambda-fn
-        (fn [] nil))) ;;- (exercise/create-exercise-table creds exercise-table))))
+        (fn [_ context] nil))) ;;- (exercise/create-exercise-table creds exercise-table))))
 
     (def ^{:export true
            :doc "Adds a new workout and exercise list."}
@@ -25,7 +25,14 @@
       (async-lambda-fn
         (fn [event context]
           (workout/add-workout creds workout-table event context))))
-)
+
+    (def ^{:export true
+           :doc "Returns a set of workouts."}
+         get-workouts
+      (async-lambda-fn
+        (fn [event context]
+          (workout/get-workouts creds workout-table event context))))
+ )
 
 ; (def ^:export add-exercise
 ;   (let [table :exercise]
